@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          Int     @id @default(autoincrement())
+  email       String  @unique
+  firstname   String
+  lastname    String
+  username    String
+  password    String
+  blogs       Blog[]   // user can own multiple blogs, theoretically.
+  comments    Comment[]
+  posts       Post[]
+}
+
+model Blog {
+  id          Int     @id @default(autoincrement())
+  title       String  @db.VarChar(255)
+  description String? @db.Text
+  created     DateTime @default(now())
+  owner       User    @relation(fields: [ownerId], references: [id])
+  ownerId     Int
+  posts       Post[]
+  public      Boolean @default(true)
+}
+
+model Post {
+  id          Int     @id @default(autoincrement())
+  blog        Blog    @relation(fields: [blogId], references: [id])
+  blogId      Int
+  user        User    @relation(fields: [userId], references: [id])
+  userId      Int
+  comments    Comment[]
+  created     DateTime @default(now())
+  title       String   @db.VarChar(255)
+  content     String   @db.Text
+  published   Boolean  @default(true)
+}
+
+model Comment {
+  id          Int      @id @default(autoincrement())
+  post        Post     @relation(fields: [postId], references: [id])
+  postId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  created     DateTime @default(now())
+  title       String   @db.VarChar(255)
+  content     String   @db.Text
+}
