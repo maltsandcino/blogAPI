@@ -1,5 +1,3 @@
-// import {getComment, getComments, updateComment, makeComment, deleteComment}
-
 import { prisma } from "../lib/prisma.ts"; 
 // import bcrypt from "bcryptjs";
 // import { v4 as uuidv4 } from "uuid";
@@ -11,8 +9,8 @@ export const getComment = async (req, res) => {
         }
   try {
     const id = Number(req.body.commentId)
-    const userId = Number(req.user.id)
     const comment = await prisma.comment.findUnique({where: { id }});
+    // Todo: Check for user ID and whether the post is private
     return res.json(comment)}
     catch (error) {
     console.error(error);

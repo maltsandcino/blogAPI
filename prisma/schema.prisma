@@ -44,6 +44,7 @@ model Post {
   userId      Int
   comments    Comment[]
   created     DateTime @default(now())
+  updated     DateTime @updatedAt
   title       String   @db.VarChar(255)
   content     String   @db.Text
   published   Boolean  @default(true)
@@ -56,6 +57,7 @@ model Comment {
   user        User     @relation(fields: [userId], references: [id])
   userId      Int
   created     DateTime @default(now())
+  updated     DateTime @updatedAt
   title       String   @db.VarChar(255)
   content     String   @db.Text
 }

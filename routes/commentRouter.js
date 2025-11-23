@@ -13,3 +13,5 @@ commentRouter.delete("/comment", authenticateToken, deleteComment)
 commentRouter.post("/comment", authenticateToken, makeComment)
 // Get list of comments
 commentRouter.get("/comment", getComments)
+
+export default commentRouter;

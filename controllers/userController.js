@@ -70,9 +70,4 @@ export const loginUser = async (req, res) => {
         { expiresIn: "1h" }
         );
     return res.status(200).json({ token, user: result });
-
-
-
-
-  return res.json({ name: "test" });
 };

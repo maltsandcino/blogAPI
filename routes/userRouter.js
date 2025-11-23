@@ -12,4 +12,4 @@ userRouter.post("/login", loginUser)
 // Get Home 
 userRouter.get("/user", authenticateToken, getUser)
 
-export default userRouter
+export default userRouter;
