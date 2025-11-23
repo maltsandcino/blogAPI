@@ -3,6 +3,9 @@ import path from "node:path";
 import dotenv from "dotenv";
 
 import userRouter from "./routes/userRouter.js"; 
+import postRouter from "./routes/postRouter.js"; 
+import commentRouter from "./routes/commentRouter.js"; 
+import blogRouter from "./routes/blogRouter.js"; 
 const app = express();
 const PORT = 3000;
 
@@ -44,6 +47,9 @@ app.use(express.urlencoded({ extended: true }));
 
 
 app.use('/api', userRouter);
+app.use('/api', postRouter);
+app.use('/api', commentRouter);
+app.use('/api', blogRouter);
 // Fallback
 // app.use((req, res, next) => {
 //   controller.getHome(req, res);
