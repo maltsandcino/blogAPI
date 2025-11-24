@@ -12,6 +12,9 @@ const PORT = 3000;
 // Load environment variables
 dotenv.config();
 
+import cors from "cors";
+app.use(cors());
+
 // const session = require("express-session");
 // const passport = require("passport");
 // require('./passport')(passport); 

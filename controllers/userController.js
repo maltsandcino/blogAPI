@@ -59,10 +59,10 @@ export const createUser = async (req, res) => {
 export const loginUser = async (req, res) => {
     const email = req.body.email;
     const result = await prisma.user.findUnique({where: { email }});
-    if (!result) res.status(403).json({message: 'Incorrect username'});
+    if (!result) return res.status(403).json({message: 'Incorrect username'});
 
     const match = await bcrypt.compare(req.body.password, result.password);
-    if (!match) res.status(403).json({ message: 'Incorrect password'});
+    if (!match) return res.status(403).json({ message: 'Incorrect password'});
 
     const token = jwt.sign(
         { id: result.id, email: result.email, username: result.username },
