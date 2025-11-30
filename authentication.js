@@ -6,7 +6,6 @@ export function authenticateToken(req, res, next) {
   const token = authHeader && authHeader.split(" ")[1]; // Expect "Bearer <token>"
 
   console.log(token)
-
   if (!token) {
     return res.status(401).json({ error: "Token required" });
   }

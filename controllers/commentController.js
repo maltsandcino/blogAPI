@@ -66,7 +66,7 @@ export const updateComment = async (req, res) => {
 export const makeComment = async (req, res) => {
      try {
 
-      if (!req.body.commentId || req.body.postId) {
+      if (!req.body.content || !req.body.postId) {
         return res.status(400).json({ error: "commentId / postId is required" });
         }
 
@@ -82,7 +82,7 @@ export const makeComment = async (req, res) => {
             userId: userId,
             postId: postId
         },
-        select: { content: true, title: true, id: true }
+        select: { content: true, title: true, id: true, created: true }
         });
     return res.json(newComment)}
     catch (error) {

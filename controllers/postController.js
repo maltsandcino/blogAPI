@@ -66,8 +66,8 @@ export const updatePost = async (req, res) => {
 export const makePost = async (req, res) => {
      try {
 
-      if (!req.body.postId || req.body.postId) {
-        return res.status(400).json({ error: "postId / postId is required" });
+      if (!req.body.blogId) {
+        return res.status(400).json({ error: "blogID is required is required" });
         }
 
     const userId = Number(req.user.id)
@@ -82,7 +82,7 @@ export const makePost = async (req, res) => {
             userId: userId,
             blogId: blogId
         },
-        select: { content: true, title: true, id: true }
+        select: { content: true, title: true, id: true, created: true }
         });
     return res.json(newpost)}
     catch (error) {

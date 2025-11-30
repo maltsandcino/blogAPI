@@ -10,14 +10,16 @@ export const makeBlog = async (req, res) => {
     const userId = Number(req.user.id)
     const description = req.body.description
     const title = req.body.title
+    const publicBlog = req.body.public;
     // Create
     const newBlog = await prisma.blog.create({
         data: {
             description: description,
             title: title,
+            public: publicBlog,
             ownerId: userId,
         },
-        select: {title: true, id: true, description: true }
+        select: {title: true, id: true, description: true, public: true, owner: true }
         });
     return res.json(newBlog)}
     catch (error) {
@@ -81,3 +83,95 @@ export const deleteBlog = async (req, res) => {
     return res.status(500).json({ error: "Cannot delete Blog" });
   }
 };
+
+export const getBlogMostRecent = async (req, res) => {
+    
+    // We are going to zero index this in the react side
+    const page = req.query.page + 1; 
+    try {
+        const pageSize = 10;
+          const blogs = await prisma.blog.findMany({
+            where: { public: true },
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+            orderBy: { created: "desc" },
+            include: {
+            owner: {
+                select: { username: true }   // blog owner username
+            },
+            posts: {
+                orderBy: { created: "desc" }, // newest post first
+                take: 1,                      // 👈 only take the most recent post
+                include: {
+                user: {
+                    select: { username: true } // post author username
+                },
+                comments: {
+                    orderBy: { created: "desc" }, // newest comments first
+                    include: {
+                    user: {
+                        select: { username: true } // comment author username
+                    }
+                    }
+                }
+                }
+            }
+            }})
+  
+    return res.json(blogs)
+    } catch (error) {
+    
+        console.error(error);
+    return res.status(500).json({ error: "Cannot fetch Blogs" });
+}}
+
+export const getBlog = async (req, res) => {
+    const user = req.user;
+    const blog = req.query.blog
+    // First Route: Getting user's own blog
+    if (!blog){
+    try {
+       const bloginDB = await prisma.blog.findFirst({
+  where: { ownerId: user.id },
+  include: {
+    owner: true,
+    posts: {
+      orderBy: { created: 'desc' },   // make sure field matches your schema
+      include: {
+        user: {
+          select: { username: true }    // post author username only
+        },
+        comments: {
+          orderBy: { created: 'desc' },
+          include: {
+            user: {
+              select: { username: true } // comment author username only
+            }
+          }
+        }
+      }
+    }
+  }
+});
+
+    return res.json(bloginDB)
+    } catch (error) {
+        console.error(error);
+    return res.status(500).json({ error: "No Blog Found" });}}
+    else {
+        // Getting another person's blog
+        try{
+            const bloginDB = await prisma.blog.findUnique({
+                where: { blogId: blog}
+            });
+        if (bloginDB.public || bloginDB.ownerId === user.id){
+            return res.json(bloginDB)
+        }
+        else{
+            return res.status(401).json({error: "This blog is private"})
+        }
+        } catch (error) {
+            return res.status(500).json({error: "Problem accessing blog"})
+        }
+    }
+}
