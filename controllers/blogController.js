@@ -126,8 +126,9 @@ export const getBlogMostRecent = async (req, res) => {
 }}
 
 export const getBlog = async (req, res) => {
+
     const user = req.user;
-    const blog = req.query.blog
+    const blog = Number(req.query.blog)
     // First Route: Getting user's own blog
     if (!blog){
     try {
@@ -153,7 +154,6 @@ export const getBlog = async (req, res) => {
     }
   }
 });
-
     return res.json(bloginDB)
     } catch (error) {
         console.error(error);
@@ -162,15 +162,37 @@ export const getBlog = async (req, res) => {
         // Getting another person's blog
         try{
             const bloginDB = await prisma.blog.findUnique({
-                where: { blogId: blog}
+                where: { id: blog},
+                include: {
+    owner: true,
+    posts: {
+      orderBy: { created: 'desc' },   // make sure field matches your schema
+      include: {
+        user: {
+          select: { username: true }    // post author username only
+        },
+        comments: {
+          orderBy: { created: 'desc' },
+          include: {
+            user: {
+              select: { username: true } // comment author username only
+            }
+          }
+        }
+      }
+    }
+  }
             });
         if (bloginDB.public || bloginDB.ownerId === user.id){
+            console.log("found the blog")
             return res.json(bloginDB)
         }
         else{
+            console.log("found the private blog")
             return res.status(401).json({error: "This blog is private"})
         }
         } catch (error) {
+            console.log("problem")
             return res.status(500).json({error: "Problem accessing blog"})
         }
     }
